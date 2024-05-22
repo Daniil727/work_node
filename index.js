@@ -1,21 +1,38 @@
-"use strict";
 
-if(true){
-let m = 2;
-let n = 100;
+const axios = require("axios");
+const fs = require("fs").promises;
+const path = require("path");
+const http = require("http");
 
-function primeNumbers(m, n) {
-  for (let i = m; i <= n; i++) {
-    if (prime(i)) console.log(i);
-  }
-}
+(async () => {
+  const { data } = await axios.get(
+    "https://jsonplaceholder.typicode.com/posts"
+  );
+  fs.writeFile(
+    path.resolve(__dirname, "arr.json"),
+    JSON.stringify(data),
+    "utf-8",
+    (err) => {
+      if (err) {
+        throw err;
+      }
+    }
+  );
+  console.log(1);
+})();
 
-function prime(num) {
-  if (num <= 1) return false;
-  for (let i = 2; i * i <= num; i++) {
-    if (num % i === 0) return false;
-  }
-  return true;
-}
-primeNumbers(m, n);
-}
+const server = http.createServer(async(req, res) => {
+    const url = req.url;
+    const method = req.method;
+res.writeHead(200, {'Content-Type': 'appLication/json'});
+
+    if(url === "/arr.json" && method === "GET"){
+      const jsonData = await fs.readFile("./arr.json", "utf-8");
+      res.end(jsonData);
+        
+    } else {
+      res.end("Not Found");
+    }
+
+ })
+ server.listen(3000);
